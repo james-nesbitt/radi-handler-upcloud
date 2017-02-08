@@ -10,3 +10,9 @@
 	path = vendor/github.com/Sirupsen/logrus
 	url = https://github.com/sirupsen/logrus.git
 	branch = v0.11.0
+[submodule "vendor/github.com/blang/semver"]
+	path = vendor/github.com/blang/semver
+	url = https://github.com/blang/semver
+[submodule "vendor/github.com/hashicorp/go-cleanhttp"]
+	path = vendor/github.com/hashicorp/go-cleanhttp
+	url = https://github.com/hashicorp/go-cleanhttp
