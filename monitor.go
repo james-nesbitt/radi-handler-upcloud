@@ -8,6 +8,9 @@ import (
 	upcloud_request "github.com/Jalle19/upcloud-go-sdk/upcloud/request"
 
 	api_operation "github.com/wunderkraut/radi-api/operation"
+	api_property "github.com/wunderkraut/radi-api/property"
+	api_result "github.com/wunderkraut/radi-api/result"
+	api_usage "github.com/wunderkraut/radi-api/usage"
 )
 
 /**
@@ -17,26 +20,24 @@ type UpcloudMonitorHandler struct {
 	BaseUpcloudServiceHandler
 }
 
+// Return a string identifier for the Handler (not functionally needed yet)
+func (monitor *UpcloudMonitorHandler) Id() string {
+	return "upcloud.monitor"
+}
+
 // Initialize and activate the Handler
-func (monitor *UpcloudMonitorHandler) Init() api_operation.Result {
-	result := api_operation.New_StandardResult()
+func (monitor *UpcloudMonitorHandler) Operations() api_operation.Operations {
+	ops := api_operation.New_SimpleOperations()
 
 	baseOperation := monitor.BaseUpcloudServiceOperation()
 
-	ops := api_operation.Operations{}
 	ops.Add(api_operation.Operation(&UpcloudMonitorListZonesOperation{BaseUpcloudServiceOperation: *baseOperation}))
 	ops.Add(api_operation.Operation(&UpcloudMonitorListPlansOperation{BaseUpcloudServiceOperation: *baseOperation}))
 	ops.Add(api_operation.Operation(&UpcloudMonitorListServersOperation{BaseUpcloudServiceOperation: *baseOperation}))
 	ops.Add(api_operation.Operation(&UpcloudMonitorServerDetailsOperation{BaseUpcloudServiceOperation: *baseOperation}))
 	ops.Add(api_operation.Operation(&UpcloudMonitorListStoragesOperation{BaseUpcloudServiceOperation: *baseOperation}))
-	monitor.operations = &ops
 
-	return api_operation.Result(result)
-}
-
-// Rturn a string identifier for the Handler (not functionally needed yet)
-func (monitor *UpcloudMonitorHandler) Id() string {
-	return "upcloud.monitor"
+	return ops.Operations()
 }
 
 /**
@@ -65,29 +66,34 @@ func (listZones *UpcloudMonitorListZonesOperation) Description() string {
 	return "List information about the UpCloud zones."
 }
 
+// return a multiline string man page for the Operation
+func (listZones *UpcloudMonitorListZonesOperation) Help() string {
+	return ""
+}
+
 // Is this operation meant to be used only inside the API
-func (listZones *UpcloudMonitorListZonesOperation) Internal() bool {
-	return false
+func (listZones *UpcloudMonitorListZonesOperation) Usage() api_usage.Usage {
+	return api_operation.Usage_External()
 }
 
 // Run a validation check on the Operation
-func (listZones *UpcloudMonitorListZonesOperation) Validate() bool {
-	return true
+func (listZones *UpcloudMonitorListZonesOperation) Validate() api_result.Result {
+	return api_result.MakeSuccessfulResult()
 }
 
 // What settings/values does the Operation provide to an implemenentor
-func (listZones *UpcloudMonitorListZonesOperation) Properties() api_operation.Properties {
-	props := api_operation.Properties{}
+func (listZones *UpcloudMonitorListZonesOperation) Properties() api_property.Properties {
+	props := api_property.New_SimplePropertiesEmpty()
 
-	props.Add(api_operation.Property(&UpcloudGlobalProperty{}))
-	props.Add(api_operation.Property(&UpcloudZoneIdProperty{}))
+	props.Add(api_property.Property(&UpcloudGlobalProperty{}))
+	props.Add(api_property.Property(&UpcloudZoneIdProperty{}))
 
-	return props
+	return props.Properties()
 }
 
 // Execute the Operation
-func (listZones *UpcloudMonitorListZonesOperation) Exec(props *api_operation.Properties) api_operation.Result {
-	result := api_operation.New_StandardResult()
+func (listZones *UpcloudMonitorListZonesOperation) Exec(props api_property.Properties) api_result.Result {
+	res := api_result.New_StandardResult()
 
 	service := listZones.ServiceWrapper()
 	// settings := listZones.BuilderSettings()
@@ -125,16 +131,16 @@ func (listZones *UpcloudMonitorListZonesOperation) Exec(props *api_operation.Pro
 			}
 		}
 
-		result.MarkSuccess()
+		res.MarkSuccess()
 	} else {
-		result.AddError(err)
-		result.AddError(errors.New("Could not retrieve UpCloud zones information."))
-		result.MarkFailed()
+		res.AddError(err)
+		res.AddError(errors.New("Could not retrieve UpCloud zones information."))
+		res.MarkFailed()
 	}
 
-	result.MarkFinished()
+	res.MarkFinished()
 
-	return api_operation.Result(result)
+	return res.Result()
 }
 
 /**
@@ -159,29 +165,34 @@ func (listServers *UpcloudMonitorListServersOperation) Description() string {
 	return "List UpCloud servers used in the project"
 }
 
+// return a multiline string man page for the Operation
+func (listServers *UpcloudMonitorListServersOperation) Help() string {
+	return ""
+}
+
 // Is this operation meant to be used only inside the API
-func (listServers *UpcloudMonitorListServersOperation) Internal() bool {
-	return false
+func (listServers *UpcloudMonitorListServersOperation) Usage() api_usage.Usage {
+	return api_operation.Usage_External()
 }
 
 // Run a validation check on the Operation
-func (listServers *UpcloudMonitorListServersOperation) Validate() bool {
-	return true
+func (listServers *UpcloudMonitorListServersOperation) Validate() api_result.Result {
+	return api_result.MakeSuccessfulResult()
 }
 
 // What settings/values does the Operation provide to an implemenentor
-func (listServers *UpcloudMonitorListServersOperation) Properties() api_operation.Properties {
-	props := api_operation.Properties{}
+func (listServers *UpcloudMonitorListServersOperation) Properties() api_property.Properties {
+	props := api_property.New_SimplePropertiesEmpty()
 
-	props.Add(api_operation.Property(&UpcloudGlobalProperty{}))
-	props.Add(api_operation.Property(&UpcloudServerUUIDSProperty{}))
+	props.Add(api_property.Property(&UpcloudGlobalProperty{}))
+	props.Add(api_property.Property(&UpcloudServerUUIDSProperty{}))
 
-	return props
+	return props.Properties()
 }
 
 // Execute the Operation
-func (listServers *UpcloudMonitorListServersOperation) Exec(props *api_operation.Properties) api_operation.Result {
-	result := api_operation.New_StandardResult()
+func (listServers *UpcloudMonitorListServersOperation) Exec(props api_property.Properties) api_result.Result {
+	res := api_result.New_StandardResult()
 
 	service := listServers.ServiceWrapper()
 	settings := listServers.BuilderSettings()
@@ -253,16 +264,16 @@ func (listServers *UpcloudMonitorListServersOperation) Exec(props *api_operation
 			log.WithFields(log.Fields{"Filter UUIDs": uuidMatch}).Info("No servers found")
 		}
 
-		result.MarkSuccess()
+		res.MarkSuccess()
 	} else {
-		result.AddError(err)
-		result.AddError(errors.New("Could not retrieve upcloud server list."))
-		result.MarkFailed()
+		res.AddError(err)
+		res.AddError(errors.New("Could not retrieve upcloud server list."))
+		res.MarkFailed()
 	}
 
-	result.MarkFinished()
+	res.MarkFinished()
 
-	return api_operation.Result(result)
+	return res.Result()
 }
 
 /**
@@ -287,29 +298,34 @@ func (serverDetail *UpcloudMonitorServerDetailsOperation) Description() string {
 	return "UpCloud server details"
 }
 
+// return a multiline string man page for the Operation
+func (serverDetail *UpcloudMonitorServerDetailsOperation) Help() string {
+	return ""
+}
+
 // Is this operation meant to be used only inside the API
-func (serverDetail *UpcloudMonitorServerDetailsOperation) Internal() bool {
-	return false
+func (serverDetail *UpcloudMonitorServerDetailsOperation) Usage() api_usage.Usage {
+	return api_operation.Usage_External()
 }
 
 // Run a validation check on the Operation
-func (serverDetail *UpcloudMonitorServerDetailsOperation) Validate() bool {
-	return true
+func (serverDetail *UpcloudMonitorServerDetailsOperation) Validate() api_result.Result {
+	return api_result.MakeSuccessfulResult()
 }
 
 // What settings/values does the Operation provide to an implemenentor
-func (serverDetail *UpcloudMonitorServerDetailsOperation) Properties() api_operation.Properties {
-	props := api_operation.Properties{}
+func (serverDetail *UpcloudMonitorServerDetailsOperation) Properties() api_property.Properties {
+	props := api_property.New_SimplePropertiesEmpty()
 
-	props.Add(api_operation.Property(&UpcloudGlobalProperty{}))
-	props.Add(api_operation.Property(&UpcloudServerUUIDSProperty{}))
+	props.Add(api_property.Property(&UpcloudGlobalProperty{}))
+	props.Add(api_property.Property(&UpcloudServerUUIDSProperty{}))
 
-	return props
+	return props.Properties()
 }
 
 // Execute the Operation
-func (serverDetail *UpcloudMonitorServerDetailsOperation) Exec(props *api_operation.Properties) api_operation.Result {
-	result := api_operation.New_StandardResult()
+func (serverDetail *UpcloudMonitorServerDetailsOperation) Exec(props api_property.Properties) api_result.Result {
+	res := api_result.New_StandardResult()
 
 	service := serverDetail.ServiceWrapper()
 	settings := serverDetail.BuilderSettings()
@@ -371,23 +387,23 @@ func (serverDetail *UpcloudMonitorServerDetailsOperation) Exec(props *api_operat
 				log.WithFields(log.Fields{"index": count, "UUID": uuid, "tags": details.Tags, "details": details}).Info("Server Details")
 			} else {
 				log.WithError(err).WithFields(log.Fields{"UUID": uuid}).Error("Could not fetch server details.")
-				result.AddError(err)
+				res.AddError(err)
 			}
 		}
 
 		if count == 0 {
-			result.AddError(errors.New("No servers were matched."))
+			res.AddError(errors.New("No servers were matched."))
 		}
 
-		result.MarkSuccess()
+		res.MarkSuccess()
 	} else {
-		result.AddError(errors.New("No servers uuids were passed to monitor server details operation, so no details can be shown."))
-		result.MarkFailed()
+		res.AddError(errors.New("No servers uuids were passed to monitor server details operation, so no details can be shown."))
+		res.MarkFailed()
 	}
 
-	result.MarkFinished()
+	res.MarkFinished()
 
-	return api_operation.Result(result)
+	return res.Result()
 }
 
 /**
@@ -412,29 +428,34 @@ func (listPlans *UpcloudMonitorListPlansOperation) Description() string {
 	return "List UpCloud plans avaialble"
 }
 
+// return a multiline string man page for the Operation
+func (listPlans *UpcloudMonitorListPlansOperation) Help() string {
+	return ""
+}
+
 // Is this operation meant to be used only inside the API
-func (listPlans *UpcloudMonitorListPlansOperation) Internal() bool {
-	return false
+func (listPlans *UpcloudMonitorListPlansOperation) Usage() api_usage.Usage {
+	return api_operation.Usage_External()
 }
 
 // Run a validation check on the Operation
-func (listPlans *UpcloudMonitorListPlansOperation) Validate() bool {
-	return true
+func (listPlans *UpcloudMonitorListPlansOperation) Validate() api_result.Result {
+	return api_result.MakeSuccessfulResult()
 }
 
 // What settings/values does the Operation provide to an implemenentor
-func (listPlans *UpcloudMonitorListPlansOperation) Properties() api_operation.Properties {
-	props := api_operation.Properties{}
+func (listPlans *UpcloudMonitorListPlansOperation) Properties() api_property.Properties {
+	props := api_property.New_SimplePropertiesEmpty()
 
-	// props.Add(api_operation.Property(&UpcloudGlobalProperty{}))
-	// props.Add(api_operation.Property(&UpcloudServerUUIDProperty{}))
+	// props.Add(api_property.Property(&UpcloudGlobalProperty{}))
+	// props.Add(api_property.Property(&UpcloudServerUUIDProperty{}))
 
-	return props
+	return props.Properties()
 }
 
 // Execute the Operation
-func (listPlans *UpcloudMonitorListPlansOperation) Exec(props *api_operation.Properties) api_operation.Result {
-	result := api_operation.New_StandardResult()
+func (listPlans *UpcloudMonitorListPlansOperation) Exec(props api_property.Properties) api_result.Result {
+	res := api_result.New_StandardResult()
 
 	service := listPlans.ServiceWrapper()
 	//settings := listPlans.BuilderSettings()
@@ -450,11 +471,11 @@ func (listPlans *UpcloudMonitorListPlansOperation) Exec(props *api_operation.Pro
 		}
 
 	} else {
-		result.AddError(err)
-		result.MarkFailed()
+		res.AddError(err)
+		res.MarkFailed()
 	}
 
-	return api_operation.Result(result)
+	return res.Result()
 }
 
 /**
@@ -479,29 +500,34 @@ func (listStorages *UpcloudMonitorListStoragesOperation) Description() string {
 	return "List UpCloud storages"
 }
 
+// return a multiline string man page for the Operation
+func (listStorages *UpcloudMonitorListStoragesOperation) Help() string {
+	return ""
+}
+
 // Is this operation meant to be used only inside the API
-func (listStorages *UpcloudMonitorListStoragesOperation) Internal() bool {
-	return false
+func (listStorages *UpcloudMonitorListStoragesOperation) Usage() api_usage.Usage {
+	return api_operation.Usage_External()
 }
 
 // Run a validation check on the Operation
-func (listStorages *UpcloudMonitorListStoragesOperation) Validate() bool {
-	return true
+func (listStorages *UpcloudMonitorListStoragesOperation) Validate() api_result.Result {
+	return api_result.MakeSuccessfulResult()
 }
 
 // What settings/values does the Operation provide to an implemenentor
-func (listStorages *UpcloudMonitorListStoragesOperation) Properties() api_operation.Properties {
-	props := api_operation.Properties{}
+func (listStorages *UpcloudMonitorListStoragesOperation) Properties() api_property.Properties {
+	props := api_property.New_SimplePropertiesEmpty()
 
-	props.Add(api_operation.Property(&UpcloudGlobalProperty{}))
-	props.Add(api_operation.Property(&UpcloudStorageUUIDProperty{}))
+	props.Add(api_property.Property(&UpcloudGlobalProperty{}))
+	props.Add(api_property.Property(&UpcloudStorageUUIDProperty{}))
 
-	return props
+	return props.Properties()
 }
 
 // Execute the Operation
-func (listStorages *UpcloudMonitorListStoragesOperation) Exec(props *api_operation.Properties) api_operation.Result {
-	result := api_operation.New_StandardResult()
+func (listStorages *UpcloudMonitorListStoragesOperation) Exec(props api_property.Properties) api_result.Result {
+	res := api_result.New_StandardResult()
 
 	service := listStorages.ServiceWrapper()
 	settings := listStorages.BuilderSettings()
@@ -552,13 +578,13 @@ func (listStorages *UpcloudMonitorListStoragesOperation) Exec(props *api_operati
 			log.WithFields(log.Fields{"acces": request.Access, "type": request.Type, "favoriate": request.Favorite}).Info("No storages found")
 		}
 
-		result.MarkSuccess()
+		res.MarkSuccess()
 	} else {
-		result.AddError(errors.New("Could not retrieve upcloud storage list."))
-		result.MarkFailed()
+		res.AddError(errors.New("Could not retrieve upcloud storage list."))
+		res.MarkFailed()
 	}
 
-	result.MarkFinished()
+	res.MarkFinished()
 
-	return api_operation.Result(result)
+	return res.Result()
 }

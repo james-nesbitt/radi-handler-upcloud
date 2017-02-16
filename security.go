@@ -6,6 +6,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 
 	api_operation "github.com/wunderkraut/radi-api/operation"
+	api_property "github.com/wunderkraut/radi-api/property"
+	api_result "github.com/wunderkraut/radi-api/result"
+	api_usage "github.com/wunderkraut/radi-api/usage"
+
 	api_security "github.com/wunderkraut/radi-api/operation/security"
 )
 
@@ -21,16 +25,13 @@ type UpcloudSecurityHandler struct {
 }
 
 // Initialize and activate the Handler
-func (security *UpcloudSecurityHandler) Init() api_operation.Result {
-	result := api_operation.New_StandardResult()
-
+func (security *UpcloudSecurityHandler) Operations() api_operation.Operations {
 	baseOperation := security.BaseUpcloudServiceOperation()
 
-	ops := api_operation.Operations{}
+	ops := api_operation.New_SimpleOperations()
 	ops.Add(api_operation.Operation(&UpcloudSecurityUserOperation{BaseUpcloudServiceOperation: *baseOperation}))
-	security.operations = &ops
 
-	return api_operation.Result(result)
+	return ops.Operations()
 }
 
 // Rturn a string identifier for the Handler (not functionally needed yet)
@@ -59,38 +60,43 @@ func (securityUser *UpcloudSecurityUserOperation) Description() string {
 	return "Show information about the current UpCloud account."
 }
 
+// return a multiline string man page for the Operation
+func (securityUser *UpcloudSecurityUserOperation) Help() string {
+	return ""
+}
+
 // Is this operation meant to be used only inside the API
-func (securityUser *UpcloudSecurityUserOperation) Internal() bool {
-	return false
+func (securityUser *UpcloudSecurityUserOperation) Usage() api_usage.Usage {
+	return api_operation.Usage_External()
 }
 
 // Run a validation check on the Operation
-func (securityUser *UpcloudSecurityUserOperation) Validate() bool {
-	return true
+func (securityUser *UpcloudSecurityUserOperation) Validate() api_result.Result {
+	return api_result.MakeSuccessfulResult()
 }
 
 // What settings/values does the Operation provide to an implemenentor
-func (securityUser *UpcloudSecurityUserOperation) Properties() api_operation.Properties {
-	return api_operation.Properties{}
+func (securityUser *UpcloudSecurityUserOperation) Properties() api_property.Properties {
+	return api_property.New_SimplePropertiesEmpty().Properties()
 }
 
 // Execute the Operation
-func (securityUser *UpcloudSecurityUserOperation) Exec(props *api_operation.Properties) api_operation.Result {
-	result := api_operation.New_StandardResult()
+func (securityUser *UpcloudSecurityUserOperation) Exec(props api_property.Properties) api_result.Result {
+	res := api_result.New_StandardResult()
 
 	service := securityUser.ServiceWrapper()
 
 	account, err := service.GetAccount()
 	if err == nil {
 		log.WithFields(log.Fields{"username": account.UserName, "credits": account.Credits}).Info("Current UpCloud Account")
-		result.MarkSuccess()
+		res.MarkSuccess()
 	} else {
-		result.AddError(err)
-		result.AddError(errors.New("Could not retrieve UpCloud account information."))
-		result.MarkFailed()
+		res.AddError(err)
+		res.AddError(errors.New("Could not retrieve UpCloud account information."))
+		res.MarkFailed()
 	}
 
-	result.MarkFinished()
+	res.MarkFinished()
 
-	return api_operation.Result(result)
+	return res.Result()
 }
