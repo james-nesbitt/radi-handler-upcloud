@@ -6,7 +6,8 @@ import (
 	upcloud "github.com/Jalle19/upcloud-go-sdk/upcloud"
 	upcloud_request "github.com/Jalle19/upcloud-go-sdk/upcloud/request"
 
-	api_operation "github.com/wunderkraut/radi-api/operation"
+	api_property "github.com/wunderkraut/radi-api/property"
+	api_usage "github.com/wunderkraut/radi-api/usage"
 )
 
 /**
@@ -30,7 +31,7 @@ const (
 // A boolean flag that tells upcloud to consider services/zones outside the scope of the project
 // @NOTE this is kind of risky to use, so it should be limited to safe operations
 type UpcloudGlobalProperty struct {
-	api_operation.BooleanProperty
+	api_property.BooleanProperty
 }
 
 // ID returns string unique property Identifier
@@ -49,15 +50,15 @@ func (global *UpcloudGlobalProperty) Description() string {
 }
 
 // Mark a property as being for internal use only (no shown to users)
-func (global *UpcloudGlobalProperty) Internal() bool {
-	return false
+func (global *UpcloudGlobalProperty) Usage() api_usage.Usage {
+	return api_property.Usage_Optional()
 }
 
 // A boolean flag that tells upcloud to force operations to proceed even if
 // blocked by server status.  This may require an additional operation process.
 // For example, when deleting a running server, this would first stop the server
 type UpcloudForceProperty struct {
-	api_operation.BooleanProperty
+	api_property.BooleanProperty
 }
 
 // ID returns string unique property Identifier
@@ -76,13 +77,13 @@ func (force *UpcloudForceProperty) Description() string {
 }
 
 // Mark a property as being for internal use only (no shown to users)
-func (force *UpcloudForceProperty) Internal() bool {
-	return false
+func (force *UpcloudForceProperty) Usage() api_usage.Usage {
+	return api_property.Usage_Optional()
 }
 
 // A boolean flag that tells that command to stay attached until the operation is complete
 type UpcloudWaitProperty struct {
-	api_operation.BooleanProperty
+	api_property.BooleanProperty
 }
 
 // ID returns string unique property Identifier
@@ -101,13 +102,13 @@ func (wait *UpcloudWaitProperty) Description() string {
 }
 
 // Mark a property as being for internal use only (no shown to users)
-func (wait *UpcloudWaitProperty) Internal() bool {
-	return false
+func (wait *UpcloudWaitProperty) Usage() api_usage.Usage {
+	return api_property.Usage_Optional()
 }
 
 // A string slice property to match to server UUID
 type UpcloudServerUUIDProperty struct {
-	api_operation.StringProperty
+	api_property.StringProperty
 }
 
 // ID returns string unique property Identifier
@@ -126,13 +127,13 @@ func (uuid *UpcloudServerUUIDProperty) Description() string {
 }
 
 // Mark a property as being for internal use only (no shown to users)
-func (uuid *UpcloudServerUUIDProperty) Internal() bool {
-	return false
+func (uuid *UpcloudServerUUIDProperty) Usage() api_usage.Usage {
+	return api_property.Usage_Optional()
 }
 
 // A string slice property to match to server UUID
 type UpcloudServerUUIDSProperty struct {
-	api_operation.StringSliceProperty
+	api_property.StringSliceProperty
 }
 
 // ID returns string unique property Identifier
@@ -151,13 +152,13 @@ func (uuids *UpcloudServerUUIDSProperty) Description() string {
 }
 
 // Mark a property as being for internal use only (no shown to users)
-func (uuids *UpcloudServerUUIDSProperty) Internal() bool {
-	return false
+func (uuids *UpcloudServerUUIDSProperty) Usage() api_usage.Usage {
+	return api_property.Usage_Optional()
 }
 
 // A string slice property to match to storage UUID
 type UpcloudStorageUUIDProperty struct {
-	api_operation.StringProperty
+	api_property.StringProperty
 }
 
 // ID returns string unique property Identifier
@@ -176,13 +177,13 @@ func (uuid *UpcloudStorageUUIDProperty) Description() string {
 }
 
 // Mark a property as being for internal use only (no shown to users)
-func (uuid *UpcloudStorageUUIDProperty) Internal() bool {
-	return false
+func (uuid *UpcloudStorageUUIDProperty) Usage() api_usage.Usage {
+	return api_property.Usage_Optional()
 }
 
 // A string slice property to match to storage UUID
 type UpcloudStorageUUIDSProperty struct {
-	api_operation.StringSliceProperty
+	api_property.StringSliceProperty
 }
 
 // ID returns string unique property Identifier
@@ -201,13 +202,13 @@ func (uuids *UpcloudStorageUUIDSProperty) Description() string {
 }
 
 // Mark a property as being for internal use only (no shown to users)
-func (uuids *UpcloudStorageUUIDSProperty) Internal() bool {
-	return false
+func (uuids *UpcloudStorageUUIDSProperty) Usage() api_usage.Usage {
+	return api_property.Usage_Optional()
 }
 
 // A string slice property to match to zone id
 type UpcloudZoneIdProperty struct {
-	api_operation.StringSliceProperty
+	api_property.StringSliceProperty
 }
 
 // ID returns string unique property Identifier
@@ -226,8 +227,8 @@ func (id *UpcloudZoneIdProperty) Description() string {
 }
 
 // Mark a property as being for internal use only (no shown to users)
-func (id *UpcloudZoneIdProperty) Internal() bool {
-	return false
+func (id *UpcloudZoneIdProperty) Usage() api_usage.Usage {
+	return api_property.Usage_Optional()
 }
 
 // A property for the ServerDetails, not really meant for public consumption
@@ -251,8 +252,8 @@ func (details *UpcloudServerDetailsProperty) Description() string {
 }
 
 // Mark a property as being for internal use only (no shown to users)
-func (details *UpcloudServerDetailsProperty) Internal() bool {
-	return false
+func (details *UpcloudServerDetailsProperty) Usage() api_usage.Usage {
+	return api_property.Usage_Optional()
 }
 
 // Give an idea of what type of value the property consumes
@@ -294,8 +295,8 @@ func (request *UpcloudServerCreateRequestProperty) Description() string {
 }
 
 // Mark a property as being for internal use only (no shown to users)
-func (request *UpcloudServerCreateRequestProperty) Internal() bool {
-	return false
+func (request *UpcloudServerCreateRequestProperty) Usage() api_usage.Usage {
+	return api_property.Usage_Optional()
 }
 
 // Give an idea of what type of value the property consumes
@@ -304,144 +305,6 @@ func (request *UpcloudServerCreateRequestProperty) Type() string {
 }
 
 func (request *UpcloudServerCreateRequestProperty) Get() interface{} {
-	// // prov_project := "raditest"
-	// prov_zone := "fi-hel1"
-
-	// prov_initscript := "" // Initialize script. Can be a URL
-
-	// prov_user := upcloud_request.LoginUser{
-	// 	CreatePassword: "no", // Allow SSH only with key
-	// 	Username:       "radi",
-	// 	SSHKeys: []string{
-	// 		"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDEI7j4EaK2RRKgp7rA9gDIL279WtNBWsPQwKn6YNjb7i1EUAM+IYzdQbPgpYr0rMx67DhvbK1pBeL0HTXfk1ZnSbbZe2xktk+YJo6l8zQ7wYydWMcCcB5HUvgG1/ugTj6wxImYAx7sEuXY4MVO7aHmfMnjV+7Re0uXHjAPL9k5O2Xvt75RmrgG8YpE6MvZtYTzIRmINbuSAX9CWKi46ZuRNYKDyZTSarqA1TOaGKiO6vf2dM7bWqsvitOxwEC6Z0c5nIAjcAGhg+yBEEloWTqNqkxPzbh0AIIO9HjGlnbSaIffwrv78UzrHatukUQOcsg6PBvMPvhjdoB0JrscLneDy0DhF6ptAQporg3SieypB/3hiZ0RfT94c35DQufFphfsphIBXIsqENJKR383sz57PPDtVgyXKSu5ujhXUPgC1rwldGUqVtMLsvC4tcnOIbOK917QjUQ+8cJoC08XBUG10knUoIWP8ebv55sfnBTHW27g+4B1V6ub3Zyq/ZRzeJXWzSh1QmOUXp1Q47bEz3eT2/VRtKyUYAo3ChvceMSERsVtwfRgIcAreIqGy2GJQPe7NkYOAPrirwhfppoFJ/nx3xGFjg0iZIg4Z1nTpwEWBWcC5eo/yfORnhdAooJWRYO37nOrjryUZJsRbFC/Uj7JOIX2QrZEX1bm4SwgSF8tTQ==", // JRN
-	// 	},
-	// }
-	// prov_networks := []upcloud_request.CreateServerIPAddress{
-	// 	upcloud_request.CreateServerIPAddress{
-	// 		Access: "private",
-	// 		Family: "IPv4",
-	// 	},
-	// 	upcloud_request.CreateServerIPAddress{
-	// 		Access: "public",
-	// 		Family: "IPv4",
-	// 	},
-	// 	upcloud_request.CreateServerIPAddress{
-	// 		Access: "public",
-	// 		Family: "IPv6",
-	// 	},
-	// }
-	// prov_storages := []upcloud.CreateServerStorageDevice{
-	// 	upcloud.CreateServerStorageDevice{ // primary disk
-	// 		Action:  "clone",
-	// 		Storage: "01000000-0000-4000-8000-000080010200", //size=5 title="CoreOS Stable 1068.8.0" type=template
-	// 		Title:   "coreos-install",
-	// 		Size:    10, // Storage size in gigabytes, if cloning it has to be larger the source size
-	// 		Tier:    "maxiops",
-	// 	},
-	// 	upcloud.CreateServerStorageDevice{ // primary disk
-	// 		Action:  "create",
-	// 		Address: "virtio:0",
-	// 		Title:   "coreos-root",
-	// 		Size:    10,
-	// 		Tier:    "maxiops",
-	// 		Type:    "disk",
-	// 	},
-	// }
-	// prov_firewall_rules := []upcloud.FirewallRule{
-	// 	// upcloud.FirewallRule{
-	// 	// 	Action:                  "accept",
-	// 	// 	Comment:                 "Alow HTTP from anywhere",
-	// 	// 	DestinationAddressEnd:   "",
-	// 	// 	DestinationAddressStart: "",
-	// 	// 	DestinationPortEnd:      "80",
-	// 	// 	DestinationPortStart:    "80",
-	// 	// 	Direction:               "in",
-	// 	// 	Family:                  "IPv4",
-	// 	// 	ICMPType:                "",
-	// 	// 	Position:                1,
-	// 	// 	Protocol:                "",
-	// 	// 	SourceAddressEnd:        "",
-	// 	// 	SourceAddressStart:      "",
-	// 	// 	SourcePortEnd:           "",
-	// 	// 	SourcePortStart:         "",
-	// 	// },
-	// 	upcloud.FirewallRule{
-	// 		Action:               "accept",
-	// 		Comment:              "Alow HTTP from anywhere",
-	// 		DestinationPortEnd:   "80",
-	// 		DestinationPortStart: "80",
-	// 		Direction:            "in",
-	// 		Family:               "IPv4",
-	// 		Position:             1,
-	// 		Protocol:             "tcp",
-	// 	},
-	// 	upcloud.FirewallRule{
-	// 		Action:               "accept",
-	// 		Comment:              "Allow SSH from a specific network only",
-	// 		DestinationPortEnd:   "22",
-	// 		DestinationPortStart: "22",
-	// 		Direction:            "in",
-	// 		Family:               "IPv4",
-	// 		ICMPType:             "tcp",
-	// 		Position:             2,
-	// 		Protocol:             "tcp",
-	// 		SourceAddressEnd:     "192.168.1.255",
-	// 		SourceAddressStart:   "192.168.1.1",
-	// 	},
-	// 	upcloud.FirewallRule{
-	// 		Action:                  "accept",
-	// 		Comment:                 "Allow SSH over IPv6 from this range",
-	// 		DestinationAddressEnd:   "",
-	// 		DestinationAddressStart: "",
-	// 		DestinationPortEnd:      "22",
-	// 		DestinationPortStart:    "22",
-	// 		Direction:               "in",
-	// 		Family:                  "IPv6",
-	// 		ICMPType:                "",
-	// 		Position:                3,
-	// 		Protocol:                "tcp",
-	// 		SourceAddressEnd:        "2a04:3540:1000:aaaa:bbbb:cccc:d001",
-	// 		SourceAddressStart:      "2a04:3540:1000:aaaa:bbbb:cccc:d001",
-	// 		SourcePortEnd:           "",
-	// 		SourcePortStart:         "",
-	// 	},
-	// 	upcloud.FirewallRule{
-	// 		Action:    "accept",
-	// 		Comment:   "Allow ICMP echo request (ping)",
-	// 		Direction: "in",
-	// 		Family:    "IPv4",
-	// 		Position:  4,
-	// 		Protocol:  "icmp",
-	// 		ICMPType:  "8",
-	// 	},
-	// 	upcloud.FirewallRule{
-	// 		Action:    "drop",
-	// 		Direction: "in",
-	// 		Position:  5,
-	// 	},
-	// }
-
-	// // hardcoded_tag := "radi-provisioned-" + prov_project
-
-	// request.value = upcloud_request.CreateServerRequest{
-	// 	//AvoidHost  string `xml:"avoid_host,omitempty"`
-	// 	//BootOrder  string `xml:"boot_order,omitempty"`
-	// 	//CoreNumber int    `xml:"core_number,omitempty"`
-	// 	Firewall:    "on",
-	// 	Hostname:    prov_project,
-	// 	IPAddresses: prov_networks,
-	// 	LoginUser:   &prov_user,
-	// 	// MemoryAmount: 2048,
-	// 	PasswordDelivery: "none",
-	// 	Plan:             "1xCPU-1GB",
-	// 	StorageDevices:   prov_storages,
-	// 	TimeZone:         "Europe/Helsinki",
-	// 	Title:            prov_project + ": provisioned automatically by radi",
-	// 	UserData:         prov_initscript,
-	// 	//VNC: "off",
-	// 	Zone: prov_zone,
-	// }
-
 	return interface{}(request.value)
 }
 func (request *UpcloudServerCreateRequestProperty) Set(value interface{}) bool {
@@ -475,8 +338,8 @@ func (firewallRules *UpcloudFirewallRulesProperty) Description() string {
 }
 
 // Mark a property as being for internal use only (no shown to users)
-func (firewallRules *UpcloudFirewallRulesProperty) Internal() bool {
-	return false
+func (firewallRules *UpcloudFirewallRulesProperty) Usage() api_usage.Usage {
+	return api_property.Usage_Optional()
 }
 
 // Give an idea of what type of value the property consumes

@@ -1,7 +1,7 @@
 package upcloud
 
 import (
-	api_operation "github.com/wunderkraut/radi-api/operation"
+	api_result "github.com/wunderkraut/radi-api/result"
 )
 
 /**
@@ -13,8 +13,6 @@ import (
 type BaseUpcloudServiceHandler struct {
 	factory         UpcloudFactory
 	builderSettings *UpcloudBuilderSettings
-
-	operations *api_operation.Operations
 }
 
 // Constructor for BaseUpcloudServiceHandler
@@ -22,8 +20,6 @@ func New_BaseUpcloudServiceHandler(factory UpcloudFactory, builderSettings *Upcl
 	return &BaseUpcloudServiceHandler{
 		factory:         factory,
 		builderSettings: builderSettings,
-
-		operations: &api_operation.Operations{},
 	}
 }
 
@@ -32,9 +28,9 @@ func (base *BaseUpcloudServiceHandler) BaseUpcloudServiceOperation() *BaseUpclou
 	return New_BaseUpcloudServiceOperation(base.factory, base.builderSettings)
 }
 
-// Get the operations from the handler
-func (base *BaseUpcloudServiceHandler) Operations() *api_operation.Operations {
-	return base.operations
+// Initialize and activate the Handler
+func (base *BaseUpcloudServiceHandler) Validate() api_result.Result {
+	return api_result.MakeSuccessfulResult()
 }
 
 // Get the factory

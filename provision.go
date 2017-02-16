@@ -10,6 +10,9 @@ import (
 	upcloud_request "github.com/Jalle19/upcloud-go-sdk/upcloud/request"
 
 	api_operation "github.com/wunderkraut/radi-api/operation"
+	api_property "github.com/wunderkraut/radi-api/property"
+	api_result "github.com/wunderkraut/radi-api/result"
+
 	api_provision "github.com/wunderkraut/radi-api/operation/provision"
 )
 
@@ -27,20 +30,16 @@ type UpcloudProvisionHandler struct {
 }
 
 // Initialize and activate the Handler
-func (provision *UpcloudProvisionHandler) Init() api_operation.Result {
-	result := api_operation.New_StandardResult()
-
+func (provision *UpcloudProvisionHandler) Operations() api_operation.Operations {
 	baseOperation := provision.BaseUpcloudServiceOperation()
 
-	ops := api_operation.Operations{}
+	ops := api_operation.New_SimpleOperations()
 
 	ops.Add(api_operation.Operation(&UpcloudProvisionUpOperation{BaseUpcloudServiceOperation: *baseOperation}))
 	ops.Add(api_operation.Operation(&UpcloudProvisionStopOperation{BaseUpcloudServiceOperation: *baseOperation}))
 	ops.Add(api_operation.Operation(&UpcloudProvisionDownOperation{BaseUpcloudServiceOperation: *baseOperation}))
 
-	provision.operations = &ops
-
-	return api_operation.Result(result)
+	return ops.Operations()
 }
 
 // Rturn a string identifier for the Handler (not functionally needed yet)
@@ -74,15 +73,13 @@ func (up *UpcloudProvisionUpOperation) Description() string {
 }
 
 // Run a validation check on the Operation
-func (up *UpcloudProvisionUpOperation) Validate() bool {
-	return true
+func (up *UpcloudProvisionUpOperation) Validate() api_result.Result {
+	return api_result.MakeSuccessfulResult()
 }
 
 // What settings/values does the Operation provide to an implemenentor
-func (up *UpcloudProvisionUpOperation) Properties() api_operation.Properties {
-	props := api_operation.Properties{}
-
-	return props
+func (up *UpcloudProvisionUpOperation) Properties() api_property.Properties {
+	return api_property.New_SimplePropertiesEmpty().Properties()
 }
 
 /**
@@ -96,8 +93,8 @@ func (up *UpcloudProvisionUpOperation) Properties() api_operation.Properties {
  * @TODO build properties properly from the child operations
  * @TODO This operation should operate in parrallel
  */
-func (up *UpcloudProvisionUpOperation) Exec(props *api_operation.Properties) api_operation.Result {
-	result := api_operation.New_StandardResult()
+func (up *UpcloudProvisionUpOperation) Exec(props api_property.Properties) api_result.Result {
+	res := api_result.New_StandardResult()
 
 	createOp := UpcloudServerCreateOperation{BaseUpcloudServiceOperation: up.BaseUpcloudServiceOperation}
 	createProperties := createOp.Properties()
@@ -119,13 +116,13 @@ func (up *UpcloudProvisionUpOperation) Exec(props *api_operation.Properties) api
 
 		log.WithFields(log.Fields{"id": serverDefinition.Id()}).Info("Creating new server")
 
-		createResult := createOp.Exec(&createProperties)
+		createResult := createOp.Exec(createProperties)
 		<-createResult.Finished()
 
 		if !createResult.Success() {
-			result.AddErrors(createResult.Errors())
-			result.AddError(errors.New("Could not provision new UpCloud server: " + id))
-			result.MarkFailed()
+			res.AddErrors(createResult.Errors())
+			res.AddError(errors.New("Could not provision new UpCloud server: " + id))
+			res.MarkFailed()
 			continue
 		} else {
 
@@ -160,9 +157,9 @@ func (up *UpcloudProvisionUpOperation) Exec(props *api_operation.Properties) api
 			if serverDetails != nil {
 				uuid = serverDetails.UUID
 			}
-			result.AddError(err)
-			result.AddError(errors.New("Server failed to start properly : " + uuid))
-			result.MarkFailed()
+			res.AddError(err)
+			res.AddError(errors.New("Server failed to start properly : " + uuid))
+			res.MarkFailed()
 		} else {
 			log.WithFields(log.Fields{"state": serverDetails.State, "UUID": serverDetails.UUID}).Info("Server successfully created, now finalizing provisioning")
 
@@ -176,11 +173,11 @@ func (up *UpcloudProvisionUpOperation) Exec(props *api_operation.Properties) api
 				uuidProp.Set(uuid)
 			}
 
-			firewallResult := firewallOp.Exec(&firewallProperties)
+			firewallResult := firewallOp.Exec(firewallProperties)
 			<-firewallResult.Finished()
 
 			if !firewallResult.Success() {
-				result.Merge(firewallResult)
+				res.Merge(firewallResult)
 				continue
 			}
 
@@ -191,16 +188,15 @@ func (up *UpcloudProvisionUpOperation) Exec(props *api_operation.Properties) api
 		}
 	}
 
-	result.MarkFinished()
+	res.MarkFinished()
 
-	return api_operation.Result(result)
+	return res.Result()
 }
 
 // Provision up operation
 type UpcloudProvisionDownOperation struct {
 	BaseUpcloudServiceOperation
 	api_provision.BaseProvisionDownOperation
-	properties *api_operation.Properties
 }
 
 // Return the string machinename/id of the Operation
@@ -219,25 +215,25 @@ func (down *UpcloudProvisionDownOperation) Description() string {
 }
 
 // Run a validation check on the Operation
-func (down *UpcloudProvisionDownOperation) Validate() bool {
-	return true
+func (down *UpcloudProvisionDownOperation) Validate() api_result.Result {
+	return api_result.MakeSuccessfulResult()
 }
 
 // What settings/values does the Operation provide to an implemenentor
-func (down *UpcloudProvisionDownOperation) Properties() api_operation.Properties {
-	props := api_operation.Properties{}
+func (down *UpcloudProvisionDownOperation) Properties() api_property.Properties {
+	props := api_property.New_SimplePropertiesEmpty()
 
-	props.Add(api_operation.Property(&UpcloudForceProperty{}))
+	props.Add(api_property.Property(&UpcloudForceProperty{}))
 
-	return props
+	return props.Properties()
 }
 
 // Execute the Operation
 //
 // @TODO Add a way to remove the storage
 // @TODO this operation could be optimized to work parrallel
-func (down *UpcloudProvisionDownOperation) Exec(props *api_operation.Properties) api_operation.Result {
-	result := api_operation.New_StandardResult()
+func (down *UpcloudProvisionDownOperation) Exec(props api_property.Properties) api_result.Result {
+	res := api_result.New_StandardResult()
 
 	downProperties := down.Properties()
 	deleteOp := UpcloudServerDeleteOperation{BaseUpcloudServiceOperation: down.BaseUpcloudServiceOperation}
@@ -278,18 +274,18 @@ func (down *UpcloudProvisionDownOperation) Exec(props *api_operation.Properties)
 
 		log.WithFields(log.Fields{"uuids": uuids}).Info("Downing project servers")
 
-		downResult := deleteOp.Exec(&downProperties)
+		downResult := deleteOp.Exec(downProperties)
 		<-downResult.Finished()
 
-		result.Merge(downResult)
+		res.Merge(downResult)
 
 	} else {
 		log.Info("No active servers found to take down.")
 	}
 
-	result.MarkFinished()
+	res.MarkFinished()
 
-	return api_operation.Result(result)
+	return res.Result()
 }
 
 // Provision up operation
@@ -314,19 +310,19 @@ func (stop *UpcloudProvisionStopOperation) Description() string {
 }
 
 // Run a validation check on the Operation
-func (stop *UpcloudProvisionStopOperation) Validate() bool {
-	return true
+func (stop *UpcloudProvisionStopOperation) Validate() api_result.Result {
+	return api_result.MakeSuccessfulResult()
 }
 
 // What settings/values does the Operation provide to an implemenentor
-func (stop *UpcloudProvisionStopOperation) Properties() api_operation.Properties {
-	props := api_operation.Properties{}
+func (stop *UpcloudProvisionStopOperation) Properties() api_property.Properties {
+	props := api_property.New_SimplePropertiesEmpty()
 
-	props.Add(api_operation.Property(&UpcloudGlobalProperty{}))
-	props.Add(api_operation.Property(&UpcloudWaitProperty{}))
-	props.Add(api_operation.Property(&UpcloudServerUUIDProperty{}))
+	props.Add(api_property.Property(&UpcloudGlobalProperty{}))
+	props.Add(api_property.Property(&UpcloudWaitProperty{}))
+	props.Add(api_property.Property(&UpcloudServerUUIDProperty{}))
 
-	return props
+	return props.Properties()
 }
 
 // Execute the Operation
@@ -337,10 +333,10 @@ func (stop *UpcloudProvisionStopOperation) Properties() api_operation.Properties
  *  1. retrieve servers by tag
  *  2. have a "remove-specific-uuid" option?
  */
-func (stop *UpcloudProvisionStopOperation) Exec(props *api_operation.Properties) api_operation.Result {
-	result := api_operation.New_StandardResult()
+func (stop *UpcloudProvisionStopOperation) Exec(props api_property.Properties) api_result.Result {
+	res := api_result.New_StandardResult()
 
-	return api_operation.Result(result)
+	return res.Result()
 }
 
 // hold info about a server that we have processed
