@@ -54,6 +54,13 @@ func (global *UpcloudGlobalProperty) Usage() api_usage.Usage {
 	return api_property.Usage_Optional()
 }
 
+// Copy the property
+func (global *UpcloudGlobalProperty) Copy() api_property.Property {
+	prop := &UpcloudGlobalProperty{}
+	prop.Set(global.Get())
+	return api_property.Property(prop)
+}
+
 // A boolean flag that tells upcloud to force operations to proceed even if
 // blocked by server status.  This may require an additional operation process.
 // For example, when deleting a running server, this would first stop the server
@@ -81,6 +88,13 @@ func (force *UpcloudForceProperty) Usage() api_usage.Usage {
 	return api_property.Usage_Optional()
 }
 
+// Copy the property
+func (force *UpcloudForceProperty) Copy() api_property.Property {
+	prop := &UpcloudForceProperty{}
+	prop.Set(force.Get())
+	return api_property.Property(prop)
+}
+
 // A boolean flag that tells that command to stay attached until the operation is complete
 type UpcloudWaitProperty struct {
 	api_property.BooleanProperty
@@ -104,6 +118,13 @@ func (wait *UpcloudWaitProperty) Description() string {
 // Mark a property as being for internal use only (no shown to users)
 func (wait *UpcloudWaitProperty) Usage() api_usage.Usage {
 	return api_property.Usage_Optional()
+}
+
+// Copy the property
+func (wait *UpcloudWaitProperty) Copy() api_property.Property {
+	prop := &UpcloudWaitProperty{}
+	prop.Set(wait.Get())
+	return api_property.Property(prop)
 }
 
 // A string slice property to match to server UUID
@@ -131,6 +152,13 @@ func (uuid *UpcloudServerUUIDProperty) Usage() api_usage.Usage {
 	return api_property.Usage_Optional()
 }
 
+// Copy the property
+func (uuid *UpcloudServerUUIDProperty) Copy() api_property.Property {
+	prop := &UpcloudServerUUIDProperty{}
+	prop.Set(uuid.Get())
+	return api_property.Property(prop)
+}
+
 // A string slice property to match to server UUID
 type UpcloudServerUUIDSProperty struct {
 	api_property.StringSliceProperty
@@ -154,6 +182,13 @@ func (uuids *UpcloudServerUUIDSProperty) Description() string {
 // Mark a property as being for internal use only (no shown to users)
 func (uuids *UpcloudServerUUIDSProperty) Usage() api_usage.Usage {
 	return api_property.Usage_Optional()
+}
+
+// Copy the property
+func (uuids *UpcloudServerUUIDSProperty) Copy() api_property.Property {
+	prop := &UpcloudServerUUIDSProperty{}
+	prop.Set(uuids.Get())
+	return api_property.Property(prop)
 }
 
 // A string slice property to match to storage UUID
@@ -181,6 +216,13 @@ func (uuid *UpcloudStorageUUIDProperty) Usage() api_usage.Usage {
 	return api_property.Usage_Optional()
 }
 
+// Copy the property
+func (uuid *UpcloudStorageUUIDProperty) Copy() api_property.Property {
+	prop := &UpcloudStorageUUIDProperty{}
+	prop.Set(uuid.Get())
+	return api_property.Property(prop)
+}
+
 // A string slice property to match to storage UUID
 type UpcloudStorageUUIDSProperty struct {
 	api_property.StringSliceProperty
@@ -206,6 +248,13 @@ func (uuids *UpcloudStorageUUIDSProperty) Usage() api_usage.Usage {
 	return api_property.Usage_Optional()
 }
 
+// Copy the property
+func (uuids *UpcloudStorageUUIDSProperty) Copy() api_property.Property {
+	prop := &UpcloudStorageUUIDSProperty{}
+	prop.Set(uuids.Get())
+	return api_property.Property(prop)
+}
+
 // A string slice property to match to zone id
 type UpcloudZoneIdProperty struct {
 	api_property.StringSliceProperty
@@ -229,6 +278,13 @@ func (id *UpcloudZoneIdProperty) Description() string {
 // Mark a property as being for internal use only (no shown to users)
 func (id *UpcloudZoneIdProperty) Usage() api_usage.Usage {
 	return api_property.Usage_Optional()
+}
+
+// Copy the property
+func (id *UpcloudZoneIdProperty) Copy() api_property.Property {
+	prop := &UpcloudZoneIdProperty{}
+	prop.Set(id.Get())
+	return api_property.Property(prop)
 }
 
 // A property for the ServerDetails, not really meant for public consumption
@@ -274,6 +330,13 @@ func (details *UpcloudServerDetailsProperty) Set(value interface{}) bool {
 	}
 }
 
+// Copy the property
+func (details *UpcloudServerDetailsProperty) Copy() api_property.Property {
+	prop := &UpcloudServerDetailsProperty{}
+	prop.Set(details.Get())
+	return api_property.Property(prop)
+}
+
 // A property for the CreateServerRequest, not really meant for public consumption
 type UpcloudServerCreateRequestProperty struct {
 	value upcloud_request.CreateServerRequest
@@ -317,6 +380,13 @@ func (request *UpcloudServerCreateRequestProperty) Set(value interface{}) bool {
 	}
 }
 
+// Copy the property
+func (request *UpcloudServerCreateRequestProperty) Copy() api_property.Property {
+	prop := &UpcloudServerCreateRequestProperty{}
+	prop.Set(request.Get())
+	return api_property.Property(prop)
+}
+
 // A property for the CreateServerRequest, not really meant for public consumption
 type UpcloudFirewallRulesProperty struct {
 	value upcloud.FirewallRules
@@ -358,4 +428,11 @@ func (firewallRules *UpcloudFirewallRulesProperty) Set(value interface{}) bool {
 		log.WithFields(log.Fields{"value": value}).Error("Could not assign Property value, because the passed parameter was the wrong type. Expected a UpCloud FirewallRules objects")
 		return false
 	}
+}
+
+// Copy the property
+func (firewallRules *UpcloudFirewallRulesProperty) Copy() api_property.Property {
+	prop := &UpcloudFirewallRulesProperty{}
+	prop.Set(firewallRules.Get())
+	return api_property.Property(prop)
 }
